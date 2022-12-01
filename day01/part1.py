@@ -1,11 +1,5 @@
 import sys
 
-if len(sys.argv) <= 1:
-    p = "Default"
-else:
-    p = sys.argv[1]
-
-
 with open("input2.txt") as f:
     lines = f.read().splitlines()
 
@@ -22,12 +16,4 @@ with open("input2.txt") as f:
 
     sums = list(sum(c) for c in cals)
     ss = sorted(sums)
-    #print(ss)
-    print(sum(ss[-3:]))
-    exit(0)
-    max_cal = 0
-    for c in cals:
-        s = sum(c)
-        if s > max_cal:
-            max_cal = s
-    print(max_cal)
+    print(sum(sorted(sums)[-3:]))
