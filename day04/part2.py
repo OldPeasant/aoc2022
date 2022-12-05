@@ -8,12 +8,11 @@ else:
 def parse_range(r):
     return list(int(i) for i in r.split('-'))
 
-def full_overlap(r1, r2):
-    if r1[0] >= r2[0] and r1[1] <= r2[1]:
-        return True
-    if r2[0] >= r1[0] and r2[1] <= r1[1]:
-        return True
-    return False
+def inrange(val, rng):
+    return val >= rng[0] and val <= rng[1]
+
+def overlap(r1, r2):
+    return inrange(r1[0], r2) or inrange(r1[1], r2) or inrange(r2[0], r1) or inrange(r2[1], r1)
 
 with open(filename) as f:
     lines = f.read().splitlines()
@@ -23,6 +22,6 @@ with open(filename) as f:
         parts = l.split(',')
         r1 = parse_range(parts[0])
         r2 = parse_range(parts[1])
-        if full_overlap(r1, r2):
+        if overlap(r1, r2):
             count += 1
     print(count)
