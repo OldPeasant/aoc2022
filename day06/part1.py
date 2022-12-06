@@ -7,8 +7,13 @@ else:
 
 
 with open(filename) as f:
-    lines = f.read().splitlines()
+    inp = f.read()
 
-
-    for l in lines:
-        print(p, l)
+    s = 0
+    while True:
+        chars = set()
+        chars.update(inp[s:s+14])
+        if len(chars) >= 14:
+            print(s + 14)
+            exit(0)
+        s += 1
