@@ -2,6 +2,9 @@ import sys
 
 LIMIT = 100000
 
+TOTAL = 70000000
+REQUIRED = 30000000
+
 if len(sys.argv) <= 1:
     raise Exception("No input file specified")
 else:
@@ -50,7 +53,13 @@ class Dir:
                 if c.get_size() <= LIMIT:
                     arr.append(c)
                 c.find_smalls(arr)
-
+    def all_child_dirs(self):
+        child_dirs = []
+        for c in self.contents:
+            if isinstance(c, Dir):
+                child_dirs.append(c)
+                child_dirs.extend(c.all_child_dirs())
+        return child_dirs
 class Parser:
     def __init__(self):
         self.curr = None
@@ -70,6 +79,11 @@ class Parser:
             else:
                 size, name = c.split(" ")
                 self.curr.contents.append(File(self.curr, int(size), name))
+
+    def all_dirs(self):
+        ad = [self.root]
+        ad.extend(self.root.all_child_dirs())
+        return ad
 
     def process(self, chunk):
         cmd = chunk[0]
@@ -113,14 +127,12 @@ with open(filename) as f:
     for c in chunks:
         p.process(c)
 #    print("-------------------------")
-    p.print()
-    small_dirs = []
-    if p.root.get_size() <= LIMIT:
-        small_dirs.append(p.root)
-    p.root.find_smalls(small_dirs)
-    print("***********************")
-    total_smalls = 0
-    for sd in small_dirs:
-        print(sd, sd.get_size())
-        total_smalls += sd.get_size()
-    print(total_smalls)
+    used = p.root.get_size()
+    missing = REQUIRED - (TOTAL - used)
+    best = p.root
+    best_size = best.get_size()
+    for d in p.all_dirs():
+        if d.get_size() >= missing and d.get_size() < best_size:
+            best = d
+            best_size = best.get_size()
+    print(best.name, best.get_size())
