@@ -1,4 +1,6 @@
 import sys
+sys.path.append('../lib')
+from pmg import *
 
 LIMIT = 100000
 
@@ -93,26 +95,14 @@ class Parser:
 with open(filename) as f:
     lines = f.read().splitlines()
 
-    chunks = []
-    curr_chunk = []
+    grouper = Grouper()
     for l in lines:
         if l.startswith("$"):
-            if len(curr_chunk) > 0:
-                chunks.append(curr_chunk)
-            curr_chunk = [l]
-        else:
-            curr_chunk.append(l)
-    if len(curr_chunk) > 0:
-        chunks.append(curr_chunk)
-#    for c in chunks:
-#        print("**** chunk ****")
-#        for e in c:
-#            print("   " + e)
-#        print("***********************")
+            grouper.next()
+        grouper.add(l)
     p = Parser()
-    for c in chunks:
+    for c in grouper.groups:
         p.process(c)
-#    print("-------------------------")
     p.print()
     small_dirs = []
     if p.root.get_size() <= LIMIT:

@@ -1,12 +1,9 @@
 import sys
 
-if len(sys.argv) <= 1:
-    raise Exception("No input file specified")
-else:
-    filename = sys.argv[1]
+sys.path.append('../lib')
+from pmg import *
 
-
-with open(filename) as f:
+with open(sys.argv[1]) as f:
     lines = f.read().splitlines()
 
 
