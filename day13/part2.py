@@ -3,6 +3,8 @@ import sys
 sys.path.append('../lib')
 from pmg import *
 
+from functools import cmp_to_key
+
 class PIter:
     def __init__(self, data):
         self.data = data
@@ -119,29 +121,43 @@ def right_order(pair):
     print("don't know")
     return None
 
+def compare_pairs(p1, p2):
+    c = right_order((p1, p2))
+    if c is True:
+        return -1
+    elif c is False:
+        return 1
+    elif c is None:
+        return 0
+    else:
+        raise Exception()
+
 with open(sys.argv[1]) as f:
     lines = f.read().splitlines()
 
-    pairs = []
+    items = list([parse(l) for l in lines if len(l) > 0])
+    div1 = [[2]]
+    div2 = [[6]]
+    items.append(div1)
+    items.append(div2)
 
-    index = 0
-    while True:
-        line1 = parse(lines[index])
-        line2 = parse(lines[index + 1])
-        pairs.append( (line1, line2) )
-        #assert(index >= len(len(lines) + 1) or len(lines[index + 2]) == 0)
-        index += 3
-        if index >= len(lines):
-            break
+    print('----------------------------------------------------')
+    for s in items:
+        print(s)
 
-    sum_ix = 0
+    st = sorted(items, key=cmp_to_key(compare_pairs))
+
+    print("====================================================")
+    for s in st:
+        print(s)
     index = 1
-    for p in pairs:
-        print("======= Checking pair " + str(index) + ": "  + str(p[0]) + " vs " + str(p[1]))
-        if right_order(p):
-            print("  right order, sum += " + str(index))
-            sum_ix += index
-        else:
-            print("  wrong order")
+    for s in st:
+        if s == div1:
+            ix_div1 = index
+        if s == div2:
+            ix_div2 = index
         index += 1
-    print(sum_ix)
+
+    print(ix_div1)
+    print(ix_div2)
+    print(ix_div1 * ix_div2)
