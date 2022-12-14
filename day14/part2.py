@@ -39,6 +39,8 @@ with open(sys.argv[1]) as f:
                     grid.set(x, start[1], "#")
             else:
                 raise Exception()
+    for x in range(-3* max_y, 500 + 3 * max_y):
+        grid.set(x, max_y + 2, "#")
     print_grid(grid)
     source = (500, 0)
     count_sand = 0
@@ -55,11 +57,14 @@ with open(sys.argv[1]) as f:
                 px = px + 1
                 py = py + 1
             else:
+                if grid.get(px, py) == 'O':
+                    print(count_sand)
+                    exit(1)
                 grid.set(px, py, 'O')
                 break
-            if py > max_y:
-                print(count_sand)
-                exit(0)
-        print_grid(grid)
+            #if py > max_y:
+            #    print(count_sand)
+            #    exit(0)
+        #print_grid(grid)
         count_sand += 1
 

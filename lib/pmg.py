@@ -20,6 +20,34 @@ def multi_list(*args, value=None):
     else:
         return [value for x in range(args[0])]
 
+def sig(n):
+    if n < 0:
+        return -1
+    elif n > 0:
+        return 1
+    elif n == 0:
+        return 0
+    else:
+        raise Exception()
+        
+class DictGrid:
+    def __init__(self, value=None):
+        self.data = {}
+        self.default_value = value
+    
+    def _key(self, x, y):
+    	return str(x) + ":" + str(y)
+    	
+    def set(self, x, y, v):
+        self.data[self._key(x, y)] = v
+    def get(self, x, y):
+        key = self._key(x, y)
+        if key in self.data:
+            return self.data[key]
+        else:
+            return self.default_value
+
+            
 class Grid:
     def __init__(self, width, height, value=None):
         self.data = multi_list(width, height, value=value)
