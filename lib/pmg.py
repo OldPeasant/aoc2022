@@ -46,6 +46,8 @@ class DictGrid:
             return self.data[key]
         else:
             return self.default_value
+    def all_coords(self):
+    	return [ (int(p[0]), int(p[1])) for p in ([k.split(":") for k in self.data.keys()]) ]
 
             
 class Grid:
@@ -84,3 +86,18 @@ class Grid:
             if y >= 0 and y < len(self.data[x]):
                 return True
         return False
+
+def manhattan_dist(p1, p2):
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+
+def points_at_manhattan_dist(p, d):
+    result = []
+    i = 1
+    while i <= d:
+        result.append((p[0] - d + i, p[1] + i))
+        result.append((p[0] + i, p[1] + d - i))
+        result.append((p[0] + d - i, p[1] - i))
+        result.append((p[0] - i, p[1] - d + i))
+        
+        i += 1
+    return result

@@ -5,9 +5,9 @@ from pmg import *
 
 def print_grid(grid):
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    for y in range(-50, 50):
+    for y in range(0, 21):
         line = ""
-        for x in range(-50, 50):
+        for x in range(0, 21):
             v = grid.get(x, y)
             line += (v if v is not None else '.')
         print(line)
@@ -30,14 +30,14 @@ with open(sys.argv[1]) as f:
         dist = manhattan_dist(sensor, beacon)
         delta_y = abs(sensor[1] - interesting)
         remaining = dist - delta_y
-        if delta_y <= interesting:
-            for x in range(sensor[0] - remaining, sensor[0] + remaining + 1):
-                grid.set(x, interesting, '#')
-        #if abs(sensor[1] - beacon[1]) <= abs(sensor[1] - 2000000):
-        #    for d in range(dist + 1):
-        #        for p in points_at_manhattan_dist(sensor, d):
-        #            if not p == beacon and not p == sensor:
-        #                grid.set(p[0], p[1], '#')
+        #if delta_y <= interesting:
+        #    for x in range(sensor[0] - remaining, sensor[0] + remaining + 1):
+        #        grid.set(x, interesting, '#')
+        if abs(sensor[1] - beacon[1]) <= abs(sensor[1] - 2000000):
+            for d in range(dist + 1):
+                for p in points_at_manhattan_dist(sensor, d):
+                    if not p == beacon and not p == sensor:
+                        grid.set(p[0], p[1], '#')
         grid.set(sensor[0], sensor[1], 'S')
         grid.set(beacon[0], beacon[1], 'B')
     count = 0

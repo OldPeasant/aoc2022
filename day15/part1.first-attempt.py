@@ -14,8 +14,6 @@ def print_grid(grid):
 with open(sys.argv[1]) as f:
     lines = f.read().splitlines()
 
-    interesting = 2000000
-    #interesting = 10
     grid = DictGrid('.')
     lc = 0
     for l in lines:
@@ -28,21 +26,16 @@ with open(sys.argv[1]) as f:
         beacon = list([int(p.split("=")[1]) for p in beacon_str.split(", ")])
         print(sensor, beacon)
         dist = manhattan_dist(sensor, beacon)
-        delta_y = abs(sensor[1] - interesting)
-        remaining = dist - delta_y
-        if delta_y <= interesting:
-            for x in range(sensor[0] - remaining, sensor[0] + remaining + 1):
-                grid.set(x, interesting, '#')
-        #if abs(sensor[1] - beacon[1]) <= abs(sensor[1] - 2000000):
-        #    for d in range(dist + 1):
-        #        for p in points_at_manhattan_dist(sensor, d):
-        #            if not p == beacon and not p == sensor:
-        #                grid.set(p[0], p[1], '#')
+        if abs(sensor[1] - beacon[1]) <= abs(sensor[1] - 2000000):
+            for d in range(dist + 1):
+                for p in points_at_manhattan_dist(sensor, d):
+                    if not p == beacon and not p == sensor:
+                        grid.set(p[0], p[1], '#')
         grid.set(sensor[0], sensor[1], 'S')
         grid.set(beacon[0], beacon[1], 'B')
     count = 0
     for c in grid.all_coords():
-        if c[1] == interesting and grid.get(c[0], c[1]) == '#':
+        if c[1] == 2000000 and grid.get(c[0], c[1]) == '#':
             count += 1
     print_grid(grid)
     print(count)
