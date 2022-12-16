@@ -1,0 +1,7 @@
+digraph {
+
+	AA -> BB
+	AA -> CC
+	BB -> CC
+	CC -> DD
+}

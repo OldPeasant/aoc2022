@@ -1,0 +1,16 @@
+digraph {
+    AA [label="AA [0]"]
+    BB [label="BB [13]"]
+    CC [label="CC [2]"]
+    DD [label="DD [20]"]
+    EE [label="EE [3]"]
+    HH [label="HH [22]"]
+    JJ [label="JJ [21]"]
+    AA -> DD [label="1"]
+    AA -> BB
+    BB -> CC
+    CC -> DD
+    DD -> EE
+    EE -> HH [label="3"]
+    AA -> JJ [label="2"]
+}

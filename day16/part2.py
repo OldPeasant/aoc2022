@@ -104,18 +104,18 @@ best_score = -1
 def examine(sequence, non_zero_names, score, t):
     global best_score
     print("examine", sequence, non_zero_names, score, t)
-    if t > 30:
-        return
     if score > best_score:
         best_score = score
         print("New best score", score, str(sequence))
+    if t > 26:
+        return
     last = sequence[-1]
     for nz in non_zero_names:
         d = distances.get_dist(last, nz)
         sequence.append(nz)
         new_non_zero = list(non_zero_names)
         new_non_zero.remove(nz)
-        examine(sequence, new_non_zero, score + (29 - t - d ) * valves[nz].flow, t + d + 1)
+        examine(sequence, new_non_zero, score + (25 - t - d ) * valves[nz].flow, t + d + 1)
         sequence.pop()
 with open(sys.argv[1]) as f:
     for l in f.read().splitlines():
@@ -128,6 +128,8 @@ with open(sys.argv[1]) as f:
     calc_all_distances()
     print_distances()
 
-    non_zero_names = list([ v.name for v in non_zero_valves])
+    non_zero_names = ['VR', 'KZ', 'SO', 'SC', 'RO', 'DI', 'OM', 'SP']
+    #non_zero_names = ['AJ', 'VG', 'IR', 'JL', 'PW', 'JD', 'RI']
+
     examine(['AA'], non_zero_names, 0, 0)
     print(best_score)
