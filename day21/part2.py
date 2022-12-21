@@ -10,18 +10,15 @@ class Op:
         self.a = a
         self.b = b
     def contains_unknown(self):
-#        print("check contains unknown")
-#        print(self.a, self.a.contains_unknown())
-#        print(self.b, self.b.contains_unknown())
-        any_of_them = self.a.contains_unknown() or self.b.contains_unknown()
-#        print("any of them", self.a, self.b, any_of_them)
-        return any_of_them
+        return self.a.contains_unknown() or self.b.contains_unknown()
 
     def resolve_unknown(self, other_expr):
         if self.a.contains_unknown():
             return self.resolve_unknown_left(other_expr)
         elif self.b.contains_unknown():
             return self.resolve_unknown_right(other_expr)
+        else:
+            raise Exception()
 
 class OpAdd(Op):
     def __init__(self, a, b):
@@ -87,6 +84,8 @@ class OpDiv(Op):
     def resolve_unknown_right(self, other_expr):
         return Equation(self.b, OpDiv(self.a, other_expr))
 
+OPERATIONS = {'+' : OpAdd, '-' : OpSubtr, '*' : OpMulti, '/' : OpDiv}
+
 class NumVal:
     def __init__(self, v):
         self.v = v
@@ -102,7 +101,6 @@ class NumVal:
 
 class SymVal:
     def __init__(self, txt):
-        #print("CREATE SYMVAL:", txt)
         self.txt = txt
 
     def evaluate(self):
@@ -143,9 +141,6 @@ class Equation:
         self.expr2 = expr2
 
     def resolve(self):
-        #print("Resolve equation:")
-        #print(self.expr1)
-        #print(self.expr2)
         if isinstance(self.expr1, Unknown):
             return self.expr2.evaluate()
         if isinstance(self.expr2, Unknown):
@@ -155,16 +150,10 @@ class Equation:
         elif self.expr2.contains_unknown():
             new_eq = resolve_left(self.expr2, self.expr1)
         else:
-            print("resolve equations fails")
-            print(self.expr1)
-            print(self.expr1.__class__)
-            print(self.expr1.txt)
-            print(self.expr2)
-            print(self.expr2.__class__)
-            print(self.expr2.txt)
             raise Exception()
         return new_eq.resolve()
-def cv(expr):
+
+def parse(expr):
     e = expr.strip()
     if e.isnumeric():
         return NumVal(int(e))
@@ -173,24 +162,14 @@ def cv(expr):
     else:
         return SymVal(e)
 
-def parse_expr(expr):
-    if '+' in expr:
-        return OpAdd(*(cv(v) for v in expr.split(' + ')))
-    if '-' in expr:
-        return OpSubtr(*(cv(v) for v in expr.split(' - ')))
-    if '*' in expr:
-        return OpMulti(*(cv(v) for v in expr.split(' * ')))
-    if '/' in expr:
-        return OpDiv(*(cv(v) for v in expr.split(' / ')))
-    return cv(expr)
-
 with open(sys.argv[1]) as f:
-    lines = f.read().splitlines()
-
-
-    for l in lines:
-        parts = l.split(": ")
-        monkeys[parts[0]] = parse_expr(parts[1])
+    for l in f.read().splitlines():
+        name, value = l.split(": ")
+        value_parts = value.split(' ')
+        if len(value_parts) == 1:
+            monkeys[name] = parse(value_parts[0])
+        else:
+            monkeys[name] = OPERATIONS[value_parts[1]](parse(value_parts[0]), parse(value_parts[2])  )
     r = monkeys['root']
     eq = Equation(r.a, r.b)
     print(eq.resolve())
