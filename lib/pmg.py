@@ -49,6 +49,25 @@ class DictGrid:
     def all_coords(self):
     	return [ (int(p[0]), int(p[1])) for p in ([k.split(":") for k in self.data.keys()]) ]
 
+class DictGrid3D:
+    def __init__(self, value=None):
+        self.data = {}
+        self.default_value = value
+    
+    def _key(self, x, y, z):
+    	return str(x) + ":" + str(y) + ":" + str(z)
+    	
+    def set(self, x, y, z, v):
+        self.data[self._key(x, y, z)] = v
+    def get(self, x, y, z):
+        key = self._key(x, y, z)
+        if key in self.data:
+            return self.data[key]
+        else:
+            return self.default_value
+    def all_coords(self):
+    	return [ (int(p[0]), int(p[1]), int(p[2])) for p in ([k.split(":") for k in self.data.keys()]) ]
+
             
 class Grid:
     def __init__(self, width, height, value=None):

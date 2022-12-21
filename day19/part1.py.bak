@@ -1,0 +1,159 @@
+import sys
+
+sys.path.append('../lib')
+from pmg import *
+
+def parse_cost_def(cost_def_strings):
+    cost_defs = {}
+    for cds in cost_def_strings:
+        prefix, costs_str = cds.split(' robot costs ')
+        material = prefix.split(" ")[1]
+        if costs_str.endswith('.'):
+            costs_str = costs_str[:-1]
+        costs = {}
+        for c in costs_str.split('. '):
+            for comp in c.split(" and "):
+                cost, m = comp.split(' ')
+                costs[m] = int(cost)
+        cost_defs[material] = costs
+    return cost_defs
+
+class Blueprint:
+    def __init__(self, input_line):
+        top_split = input_line.split(": ") 
+        print("&&&", top_split[0])
+        self.b_id = top_split[0].split(' ')[1]
+        self.costs = parse_cost_def(top_split[1].split('. '))
+
+    def __repr__(self):
+        return "Blueprint %s: %s" % (self.b_id, str(self.costs))
+        #for robot_name, costs in self.costs.items():
+        #    s += '[' + robot_name + ": " + str(costs) + "]"
+        #return s
+
+def try_produce(blueprint, robot, robots, material):
+    required = b.costs[robot]
+    enough = True
+    for k, v in required.items():
+        if material.get(k, 0) < v:
+            enough = False
+    if enough:
+        print("     Enough material to produce a %s, so produce it" % robot)
+        for k, v in required.items():
+            material[k] = material[k] - v
+        robots[robot] = robots.get(robot, 0) + 1
+    else:
+        for k, v in required.items():
+            if material.get(k, 0) < v and k != robot:
+                print("     not enough, so try to produce a %s" % k)
+                try_produce(blueprint, k, robots, material)
+def max_prod(costs, robot_type, material):
+#    print("     How many %s can be produced with material %s" % (robot_type, str(material)))
+    mp = 99999999
+#    print('     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+#    print("       ", costs)
+#    print('     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+    for m, needed in costs[robot_type].items():
+        cnt = material.get(m, 0) // needed
+        if cnt < mp:
+            mp = cnt
+#    print("     max prod %s is %d" % (robot_type, mp))
+    return mp
+
+def possible_moves(costs, material):
+    print("Calc possible moves of material %s" % str(material), flush=True)
+    p_moves = []
+    for i in range(max_prod(costs, 'geode', material) + 1):
+        for a in range(i + 1):
+            mat_g = material.copy()
+            if a > 0:
+                mat_g['geode'] -= a
+            for j in range(max_prod(costs, 'obsidian', mat_g) + 1):
+                for b in range(j + 1):
+                    mat_o = mat_g.copy()
+                    if b > 0:
+                        mat_o['obsidian'] -= b
+                    for k in range(max_prod(costs, 'clay', mat_o) + 1):
+                        for c in range(k + 1):
+                            mat_c = mat_o.copy()
+                            if c > 0:
+                                mat_c['clay'] -= c
+                            for l in range(max_prod(costs, 'ore', mat_c) + 1):
+                                for d in range(l + 1):
+                                    print("Create move", d, c, b, a, l, k, j, i, flush=True)
+                                    p_moves.append({'ore':d, 'clay':c, 'obsidian':b, 'geode':a})
+    print('   *** possible %d  moves ***' % len(p_moves), flush=True)
+    for m in p_moves:
+        print("      ", m, flush=True)
+    print("   *** eonf of moves  ***", flush=True)
+    return p_moves
+
+def make_move(costs, robots, material, move):
+    print(" //// make move %s with material %s" % (str(move), str(material)))
+    print("    (costs are %s)" % str(costs))
+    for m, cnt in move.items():
+        print("       produce %d %s robot(s)" % (cnt, m))
+        robots[m] = robots.get(m, 0) + cnt
+        for cost_m, cost_count in costs[m].items():
+            print("before subtracting", material.get(cost_m, 0), cost_count, cnt)
+            material[cost_m] = material.get(cost_m, 0) -  cost_count * cnt
+
+            assert(material[cost_m] >= 0)
+    for r, cnt in robots.items():
+        material[r] = material.get(r, 0) + cnt
+
+
+def undo_move(costs, robots, material, move):
+    print(" //// undo move %s with material %s" % (str(move), str(material)))
+    print("    (costs are %s)" % str(costs))
+    for m, cnt in move.items():
+        print("       unproduce %d %s robot(s)" % (cnt, m))
+        robots[m] = robots.get(m, 0) - cnt
+        for cost_m, cost_count in costs[m].items():
+            material[cost_m] = material.get(cost_m, 0) +  cost_count * cnt
+
+def best_geodes(t, costs, robots, material):
+    if t == 24:
+        return material.get('geode', 0)
+    best = -1
+    for m in possible_moves(costs, material):
+        make_move(costs, robots, material, m)
+        b = best_geodes(t + 1, costs, robots, material)
+        if b > best:
+            best = b
+        undo_move(costs, robots, material, m)
+    return best
+
+def analyze_blueprint(b):
+    robots = { 'ore' : 1 }
+    material = {}
+    bg = best_geodes(0, b.costs, robots, material)
+    return bg
+
+#    for t in range(24):
+#        print("--- Minute %d ---" % (t + 1))
+#        
+#        try_produce(b, 'geode', robots, material)
+#        for mat, count in robots.items():
+#            material[mat] = material.get(mat, 0) + count
+#        print("you now have %s " % (material))
+#    return material['geode']
+
+with open(sys.argv[1]) as f:
+    lines = f.read().splitlines()
+    blueprints = []
+
+    for l in lines:
+        b = Blueprint(l)
+        print(b)
+        blueprints.append(b)
+    max_geodes = -1
+    best_blueprint = None
+    for b in blueprints:
+        mg = analyze_blueprint(b)
+        print("Blueprint %s can produce %d" % (b.b_id, mg))
+        if mg > max_geodes:
+            max_geodes = mg
+            best_blueprint = b
+    print("best blueprint:", best_blueprint.b_id)
+    print("max geodes", max_geodes)

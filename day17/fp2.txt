@@ -1,0 +1,18 @@
+def find_p(data, p):
+	print("check period %d" % p)
+	i = 1000000
+	while True:
+		if data[p+i] != data[2*p+i]:
+			print("                It's not period %d (%)" % (p, i))
+		i += 1
+	
+with open('heights_real.txt') as f:
+	heights = []
+	for l in f.read().splitlines():
+		heights.append(int(l))
+
+	p = 50455
+	i = p
+	while True:
+		find_p(heights, i)
+		i += 5
