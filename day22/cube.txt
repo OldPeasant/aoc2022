@@ -1,0 +1,28 @@
+ xx
+ x
+xx
+x
+
+
+     xKxLxxMxnx
+     A   xx   C
+     x 5 xx 6 x
+     B   xx   D
+     xxxxxxFxEx
+     xxxxx
+     G   F
+     x 4 x
+     H   E
+     xxxxx
+xGxHxxxxxx
+B   xx   D
+x 2 xx 3 x
+A   xx   C
+xxxxxxIxJx
+xxxxx
+K   I
+x 1 x
+L   J
+xMxNx
+
+E x neg -> B
