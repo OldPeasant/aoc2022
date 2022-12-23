@@ -104,7 +104,7 @@ def get_proposed(playfield, x, y, directions):
     return (x, y)
 
 def do_round(orig_pf, directions):
-    print("Directions for this round", ", ".join(d[0] for d in directions))
+    #print("Directions for this round", ", ".join(d[0] for d in directions))
     new_pf = Playfield([])
     proposals = {}
     
@@ -122,6 +122,7 @@ def do_round(orig_pf, directions):
     #print("Proposals")
     #print(proposals)
     #print(prop_count)
+    anyone_moved = False
     for src, tgt in proposals.items():
         #print("go through src, tgt in proposals")
         #print(src)
@@ -129,10 +130,13 @@ def do_round(orig_pf, directions):
         if prop_count[tgt] > 1:
             new_pf.set(*(int(c) for c in src.split(':')), '#')
         elif prop_count[tgt] == 1:
+            #print("CHK", src, tgt)
+            if src != tgt:
+                anyone_moved = True
             new_pf.set(*(int(c) for c in tgt.split(':')), '#')
         else:
             raise Exception()
-    return new_pf
+    return new_pf, anyone_moved
 
 with open(sys.argv[1]) as f:
     lines = f.read().splitlines()
@@ -140,10 +144,15 @@ with open(sys.argv[1]) as f:
     directions = Directions()
     pf = Playfield(lines)
     pf.print()
-    for round_count in range(10):
-        pf = do_round(pf, directions.get_directions())
-        print('====== after round', round_count + 1)
-        pf.print()
+    round_count = 0
+    while True:
+        pf, anyone_moved = do_round(pf, directions.get_directions())
+        #print('====== after round', round_count + 1)
+        #pf.print()
+        print("Round", round_count + 1)
         directions.next()
-
+        if not anyone_moved:
+            print("done after", round_count + 1, "rounds")
+            exit(0)
+        round_count += 1
     print(pf.count_empty())
