@@ -107,19 +107,36 @@ with open(sys.argv[1]) as f:
     playground.print()
     i = 1
     while True:
-        #playground.print()
         for p in possible_positions:
-            #print(p)
             assert(not playground.has_blizzard(*p))
         playground.move_blizzards()
-        #playground.print()
         possible_positions = playground.possible_next_pos(possible_positions)
-        print("-------  Minute", i + 1, "-------- ", len(possible_positions))
-        #print(possible_positions)
+        print("-------  (1) Minute", i + 1, "-------- ", len(possible_positions))
         if end_pos in possible_positions:
             print("Reached goal after", i, "iterations")
-            exit(0)
+            break
         i += 1
-        #if i > 20:
-        #    print("nothing found in", i, "moves")
-        #    exit(0)
+    i += 1
+    possible_positions = [end_pos]
+    while True:
+        for p in possible_positions:
+            assert(not playground.has_blizzard(*p))
+        playground.move_blizzards()
+        possible_positions = playground.possible_next_pos(possible_positions)
+        print("------- (2)  Minute", i + 1, "-------- ", len(possible_positions))
+        if start_pos in possible_positions:
+            print("Reached start after", i, "iterations")
+            break
+        i += 1
+    i += 1
+    possible_positions = [start_pos]
+    while True:
+        for p in possible_positions:
+            assert(not playground.has_blizzard(*p))
+        playground.move_blizzards()
+        possible_positions = playground.possible_next_pos(possible_positions)
+        print("------- (3) Minute", i + 1, "-------- ", len(possible_positions))
+        if end_pos in possible_positions:
+            print("Reached goal after", i, "iterations")
+            break
+        i += 1

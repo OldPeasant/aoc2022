@@ -30,6 +30,18 @@ def sig(n):
     else:
         raise Exception()
         
+class DictOfLists:
+    def __init__(self):
+        self.dict = {}
+        
+    def add(self, key, value):
+        self.get(key).append(value)
+    
+    def get(self, key):
+        if key not in self.dict:
+            self.dict[key] = []
+        return self.dict[key]
+        
 class DictGrid:
     def __init__(self, value=None):
         self.data = {}
